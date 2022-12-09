@@ -1,54 +1,34 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-require('isomorphic-fetch');
+// ################ CODEBLOCK 1 - START ##############
+import { DaprClient, DaprServer } from '@dapr/dapr';
+// ################ CODEBLOCK 1 - END ################
 
+// ################ CODEBLOCK 2 - START ##############
+const SERVER_HOST = process.env.SERVER_HOST || "127.0.0.1";
 const APP_PORT = process.env.APP_PORT ?? '3000';
+const DAPR_HOST = process.env.DAPR_HOST || "http://localhost";
+const DAPR_PORT = process.env.DAPR_HTTP_PORT ?? "3500";
+// ################ CODEBLOCK 2 - END ################
 
-const daprPort = process.env.DAPR_HTTP_PORT ?? "3500";
+// ################ CODEBLOCK 3 - START ##############
+const server = new DaprServer(SERVER_HOST, APP_PORT, DAPR_HOST, DAPR_PORT);
+const client = new DaprClient(DAPR_HOST, DAPR_PORT)
+// ################ CODEBLOCK 3 - END ################
 
-const stateStoreName = `statestore`;
-const stateUrl = `http://localhost:${daprPort}/v1.0/state/${stateStoreName}`;
-
-const app = express();
-app.use(bodyParser.json({ type: 'application/*+json' }));
-
-// Dapr subscription needs to be told what topics to subscribe to and what route to call
-app.get('/dapr/subscribe', (_req, res) => {
-    res.json([
-        {
-            pubsubname: "orderpubsub",
-            topic: "test-topic",
-            route: "test-topic",
-        },
-    ]);
-});
-
-// Dapr subscription routes ordersAgain topic to this route
-app.post('/test-topic', async (req, res) => {
-    console.log("Subscriber received on test-topic:", req.body);
-    const state = [{
-        key: "order",
-        value: req.body
-    }];
-
-    try {
-        // Persist the state i.e. order
-        const response = await fetch(stateUrl, {
-            method: "POST",
-            body: JSON.stringify(state),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-        if (!response.ok) {
-            throw "Failed to persist state.";
-        }
-        console.log("Successfully persisted state.");
-        res.sendStatus(200);
-    } catch (error) {
-        console.log(error);
-        res.status(500).send({message: error});
-    }
-});
-
-app.listen(APP_PORT);  
+async function main() {
+    // ################ CODEBLOCK 4 - START ##############
+    server.pubsub.subscribe("orderpubsub", "test-topic", async (order) => {
+        console.log("Subscriber received: " + JSON.stringify(order))
+        const state = [{
+            key: "orders",
+            value: order        }];
+        // Save state into a state store
+        await client.state.save(`statestore`, state)
+        console.log("Saving Order: ", order)
+    });
+  
+    await server.start();
+    // ################ CODEBLOCK 4 - END ################
+  }
+  
+  // call the process function
+  main().catch(e => console.error(e));

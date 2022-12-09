@@ -1,48 +1,49 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-require('isomorphic-fetch');
+// ################ CODEBLOCK 1 - START ##############
+import express from "express";
 
 //import `redis` library
-const redis = require('ioredis');
+import redis from "ioredis";
 
 // import the `Kafka` instance from the kafkajs library
-const { Kafka } = require("kafkajs")
+import {Kafka} from 'kafkajs';
+// ################ CODEBLOCK 1 - END ################
 
-const app = express();
-app.listen(3000);
-app.use(bodyParser.json());
-
-const redisClient = redis.createClient(6379, "redis-master");
-
-console.log('In order-processor!');
-
+// ################ CODEBLOCK 2 - START ##############
 // the client ID lets kafka know who's producing the messages
 const clientId = "my-app"
 // we can define the list of brokers in the cluster
 const brokers = ["my-kafka:9092"]
 // this is the topic to which we want to write messages
 const topic = "test-topic"
+// ################ CODEBLOCK 2 - END ################
 
+// ################ CODEBLOCK 3 - START ##############
 // initialize a new kafka client and initialize a producer from it
 const kafka = new Kafka({ clientId, brokers })
-
 // initialize a consumer with the client ID
 const consumer = kafka.consumer({ groupId: clientId })
 
-const consume = async () => {
+const redisClient = redis.createClient(6379, "redis-master");
+
+const app = express();
+app.listen(3000);
+// ################ CODEBLOCK 3 - END ################
+
+async function main() {
+    // ################ CODEBLOCK 4 - START ##############
 	// first, we wait for the client to connect and subscribe to the given topic
 	await consumer.connect()
 	await consumer.subscribe({ topic })
+    let i = 0;
 	await consumer.run({
 		// this function is called every time the consumer gets a new message
 		eachMessage: async ({ message }) => {
 			// here, we just log the message to the standard output
 			console.log(`received message: ${message.value}`)
-            // take out the message value
-            const orderVal = `${message.value}`;
+            i++;
             try {
                 // Set the state in redis
-                redisClient.set('order',JSON.stringify(orderVal))
+                redisClient.hset('order-processor||orders', 'data', `${message.value}`, 'version', i);
                 console.log("Successfully persisted state.");
             } catch (error) {
                 // catch and log any errors
@@ -50,19 +51,8 @@ const consume = async () => {
             }
 		},
 	})
+    // ################ CODEBLOCK 4 - END ################
 }
 
-// call the consume function
-consume().catch((err) => {
-	console.error("error in consumer: ", err)
-})
-
-// simply checking if the redis connection is fine
-redisClient.on('connect', function() {
-    console.log('Redis Connected!');
-  });
-
-// if there is an error in redis connection, log it
-redisClient.on('error', err => {
-    console.log('Redis Error: ' + err);
-});
+// call the process function
+main().catch(e => console.error(e));
