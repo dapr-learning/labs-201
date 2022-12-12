@@ -29,10 +29,9 @@ We will create a simple deployment architecture with 2 microservices and a Dapr 
 
 ![Deployment architecture](./static-reources/service-arch.png)
 
-To mimic, “Not Caring This Part For Demo” section, we will simply generate few Order Ids in “Checkout” itself.
-These will be published to a Message Broker, from where Order Processor will fetch them and dump them in a State Store against “Order” Key.
+We will generate few Order Ids in “Checkout” App itself.
+These will be published to Kafka, from where Order Processor will fetch them and save them in Redis state store against “order” key.
 In the state store, we should be able to see that order id value for Order is increasing gradually.
-
 
 We will be using *Python for Checkout* App and *Javascript for Order-Processor* App.
 
