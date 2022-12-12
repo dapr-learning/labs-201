@@ -21,9 +21,9 @@ This set of pre-requisites is built with the assumption that participants are us
 
 1. AKS cluster setup (Quickstart: Deploy an AKS cluster by using the Azure portal - Azure Kubernetes Service | Microsoft Learn (https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-portal?tabs=azure-cli)): Create New Cluster (You can use either any MS subscription or even Private subscription)
 2. WSL2 (Install WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/install)):  Setup following in WSL2:
-**a.** Terminal for WSL2 (Windows Terminal Customization for WSL2 - The Complete Guide (ceos3c.com) (https://www.ceos3c.com/wsl-2/windows-terminal-customization-wsl2/))
-**b.** VS Code: Should be able to open with code . . (Get started using VS Code with WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode))
-     **c.** Helm 3 (Helm | Installing Helm (https://helm.sh/docs/intro/install/))
+  **a.** Terminal for WSL2 (Windows Terminal Customization for WSL2 - The Complete Guide (ceos3c.com) (https://www.ceos3c.com/wsl-2/windows-terminal-customization-wsl2/))
+  **b.** VS Code: Should be able to open with code . . (Get started using VS Code with WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode))
+  **c.** Helm 3 (Helm | Installing Helm (https://helm.sh/docs/intro/install/))
   **d.** [Git](https://learn.microsoft.com/en-us/devops/develop/git/install-and-set-up-git)
   **e.** Install `kubectl` the [k8s CLI](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli#connect-to-the-cluster).
   **f.** Connect to AKS on WSL2 (Ideally, it is done in Step 1 itself, just confirmation by running few basic kubectl commands)
