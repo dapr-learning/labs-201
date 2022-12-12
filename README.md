@@ -228,17 +228,16 @@ Once you have a terminal connected to Redis, following command should show one o
 ```bash
 keys *
 ```
--  Enquire back-to-back to check if order id and version are getting updated in state store:
+-  Run the following command multiple times  to observe `orderId` and `version` being updated in state store:
 ```bash
 hgetall order-processor||orders
 ```
 
 #### Cleanup
-We need to ensure that we have deleted un-required deployments/services now. For that, let's run following commands:
+We need to ensure that we have deleted deployments/services once we are done. For that, let's run following commands:
 ```bash
-1. kubectl delete deployment order-processor
-2. kubectl delete service order-processor
-3. kubectl delete deployment checkout
+kubectl delete -f order-processor.yaml
+kubectl delete -f checkout.yaml
 ```
 
 ### Setup Apps with Dapr
@@ -445,9 +444,7 @@ kubectl logs -f order-processor-<pod-id> node
 > Note: You can also view the daprd logs for the apps using the command `kubectl logs -f <pod-name> daprd`
 - Now, we have deployed apps with Dapr. Use steps defined [here](#connect-to-the-redis-client-pod) to connect to the redis state store.
 - Once you have a terminal connected to Redis, follow these [steps](#How-to-verify-that-Apps-are-working-Fine) to verify everything is working as expected.
-```bash
-hgetall order-processor||orders
-```
+
 #### Cleanup
 Follow same [cleanup steps](#Cleanup) as above.
 
