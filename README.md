@@ -21,15 +21,15 @@ This set of pre-requisites is built with the assumption that participants are us
 
 1. AKS cluster setup (Quickstart: Deploy an AKS cluster by using the Azure portal - Azure Kubernetes Service | Microsoft Learn (https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-portal?tabs=azure-cli)): Create New Cluster (You can use either any MS subscription or even Private subscription)
 2. WSL2 (Install WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/install)):  Setup following in WSL2:
-  1. Terminal for WSL2 (Windows Terminal Customization for WSL2 - The Complete Guide (ceos3c.com) (https://www.ceos3c.com/wsl-2/windows-terminal-customization-wsl2/))
-  2. VS Code: Should be able to open with code . . (Get started using VS Code with WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode))
-3. Helm 3 (Helm | Installing Helm (https://helm.sh/docs/intro/install/))
-4. [Git](https://learn.microsoft.com/en-us/devops/develop/git/install-and-set-up-git)
-5. Connect to AKS on WSL2
-6. Install `kubectl` the [k8s CLI](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli#connect-to-the-cluster).
-7. Install Dapr (Install the Dapr CLI | Dapr Docs (https://docs.dapr.io/getting-started/install-dapr-cli/)) and run dapr init -k
-8. Setup a virtual environment for Python (https://docs.python.org/3/tutorial/venv.html) (Atleast version 3.7)
-9. [Docker Desktop](https://www.docker.com/products/docker-desktop/): Once you setup Docker Desktop on Windows, you should be able to use docker in WSL2 by enabling “Use the WSL 2 based Engine” in Settings → General.
+**a.** Terminal for WSL2 (Windows Terminal Customization for WSL2 - The Complete Guide (ceos3c.com) (https://www.ceos3c.com/wsl-2/windows-terminal-customization-wsl2/))
+**b.** VS Code: Should be able to open with code . . (Get started using VS Code with WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode))
+     **c.** Helm 3 (Helm | Installing Helm (https://helm.sh/docs/intro/install/))
+  **d.** [Git](https://learn.microsoft.com/en-us/devops/develop/git/install-and-set-up-git)
+  **e.** Install `kubectl` the [k8s CLI](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli#connect-to-the-cluster).
+  **f.** Connect to AKS on WSL2 (Ideally, it is done in Step 1 itself, just confirmation by running few basic kubectl commands)
+  **g.** Install Dapr (Install the Dapr CLI | Dapr Docs (https://docs.dapr.io/getting-started/install-dapr-cli/)) and run dapr init -k
+  **h.** Setup a virtual environment for Python (https://docs.python.org/3/tutorial/venv.html) (Atleast version 3.7)
+3. [Docker Desktop](https://www.docker.com/products/docker-desktop/): Once you setup Docker Desktop on Windows, you should be able to use docker in WSL2 by enabling “Use the WSL 2 based Engine” in Settings → General.
 
 ![Docker desktop settings](./static-reources/docker-desktop.png)
 
@@ -221,13 +221,25 @@ kubectl logs -f checkout-<pod-id> python
 kubectl logs -f order-processor-<pod-id> node
 ```
 - Right now, we have just deployed apps without dapr. Use steps defined [here](#connect-to-the-redis-client-pod) to connect to the redis server.
-- Once you have a terminal connected to Redis, check to see if the order is added to the state store
+- Once you have a terminal connected to Redis, follow these [steps](#How-to-verify-that-Apps-are-working-Fine) to verify everything is working as expected.
+
+#### How to verify that Apps are working Fine?
+Once you have a terminal connected to Redis, following command should show one of the keys as `order-processor||orders`:
+```bash
+keys *
+```
+-  Enquire back-to-back to check if order id and version are getting updated in state store:
 ```bash
 hgetall order-processor||orders
 ```
 
 #### Cleanup
-<TBD>
+We need to ensure that we have deleted un-required deployments/services now. For that, let's run following commands:
+```bash
+1. kubectl delete deployment order-processor
+2. kubectl delete service order-processor
+3. kubectl delete deployment checkout
+```
 
 ### Setup Apps with Dapr
 
@@ -431,13 +443,13 @@ kubectl logs -f checkout-<pod-id> python
 kubectl logs -f order-processor-<pod-id> node
 ```
 > Note: You can also view the daprd logs for the apps using the command `kubectl logs -f <pod-name> daprd`
-- Right now, we have just deployed apps without dapr. Use steps defined [here](#connect-to-the-redis-client-pod) to connect to the redis state store.
-- Once you have a terminal connected to Redis, check to see if the order is added to the state store
+- Now, we have deployed apps with Dapr. Use steps defined [here](#connect-to-the-redis-client-pod) to connect to the redis state store.
+- Once you have a terminal connected to Redis, follow these [steps](#How-to-verify-that-Apps-are-working-Fine) to verify everything is working as expected.
 ```bash
 hgetall order-processor||orders
 ```
 #### Cleanup
-<TBD>
+Follow same [cleanup steps](#Cleanup) as above.
 
 ### Next Steps
 - Please do look at the other quickstarts available [here](https://github.com/dapr/quickstarts)
