@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
       - name: node
-        image: ghcr.io/deepanshua/order-processor-dapr:latest
+        image: ghcr.io/{YOUR_GITHUB_USERNAME}/order-processor-dapr:latest
         env:
         - name: APP_PORT
           value: "3000"
