@@ -1,0 +1,14 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: orderpubsub
+  namespace: default
+spec:
+  type: pubsub.kafka
+  version: v1
+  initTimeout: 1m
+  metadata:
+  - name: brokers
+    value: my-kafka:9092
+  - name: authRequired
+    value: "false"

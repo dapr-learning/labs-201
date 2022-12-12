@@ -1,31 +1,47 @@
 # Dapr 201 Labs
 
+## Table of Contents
+- [Pre-requisites](#pre-requisites)
+- [Welcome to Dapr 201](#welcome-to-dapr-201)
+  - [Deployment architecture](#deployment-architecture)
+- [Container registry for labs](#container-registry-for-the-labs)
+  - [Authenticating with GHCR](#authenticating-with-ghcr)
+- [Dependencies for Apps](#dependencies-for-the-apps)
+    - [State Store](#state-store)
+    - [Pub/Sub](#pubsub)
+- [Setup apps without Dapr](#setup-apps-without-dapr)
+  - [Checkout App](#checkout-app)
+  - [Order Processor App](#order-processor-app)
+- [Setup apps with Dapr](#setup-apps-with-dapr)
+- [Next steps](#next-steps)
+
 ## Pre-requisites
 
 This set of pre-requisites is built with the assumption that participants are using Windows OS.
 
 1. AKS cluster setup (Quickstart: Deploy an AKS cluster by using the Azure portal - Azure Kubernetes Service | Microsoft Learn (https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-portal?tabs=azure-cli)): Create New Cluster (You can use either any MS subscription or even Private subscription)
 2. WSL2 (Install WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/install)):  Setup following in WSL2:
-1. Terminal for WSL2 (Windows Terminal Customization for WSL2 - The Complete Guide (ceos3c.com) (https://www.ceos3c.com/wsl-2/windows-terminal-customization-wsl2/))
-2. VS Code: Should be able to open with code . . (Get started using VS Code with WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode))
+  1. Terminal for WSL2 (Windows Terminal Customization for WSL2 - The Complete Guide (ceos3c.com) (https://www.ceos3c.com/wsl-2/windows-terminal-customization-wsl2/))
+  2. VS Code: Should be able to open with code . . (Get started using VS Code with WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode))
 3. Helm 3 (Helm | Installing Helm (https://helm.sh/docs/intro/install/))
-4. Git
+4. [Git](https://learn.microsoft.com/en-us/devops/develop/git/install-and-set-up-git)
 5. Connect to AKS on WSL2
-6. kubectl is the k8s CLI. It works once you are connected with AKS.
+6. Install `kubectl` the [k8s CLI](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli#connect-to-the-cluster).
 7. Install Dapr (Install the Dapr CLI | Dapr Docs (https://docs.dapr.io/getting-started/install-dapr-cli/)) and run dapr init -k
-8. Docker Desktop: Once you setup Docker Desktop on Windows, you should be able to use docker in WSL2 by enabling “Use the WSL 2 based Engine” in Settings → General.
-9. Setup a virtual environment for Python (https://docs.python.org/3/tutorial/venv.html) (Atleast version 3.7)
+8. Setup a virtual environment for Python (https://docs.python.org/3/tutorial/venv.html) (Atleast version 3.7)
+9. [Docker Desktop](https://www.docker.com/products/docker-desktop/): Once you setup Docker Desktop on Windows, you should be able to use docker in WSL2 by enabling “Use the WSL 2 based Engine” in Settings → General.
 
 ![Docker desktop settings](./static-reources/docker-desktop.png)
 
 ## Welcome to Dapr 201
 
 **Quick Question**: What is the intent of this session?
-**Answer***: To get a hang of Daprizing some simple Apps, while using kubernetes. And, try to realize a bit of power that we as service owners may get by using Dapr.
+
+**Answer**: To get a hang of Daprizing some simple Apps, while using kubernetes. And, try to realize a bit of power that we as service owners may get by using Dapr.
 
 ### Deployment architecture
 
-We will create a simple deployment architecture with 2 microservices and a Dapr sidecar. The microservices will be deployed as Kubernetes pods. The Dapr sidecar will be deployed as a Kubernetes sidecar container. The Dapr sidecar will be responsible for service discovery, service invocation, and state management.
+We will create a simple deployment architecture with 2 microservices and a Dapr sidecar. The microservices will be deployed as Kubernetes pods. The Dapr sidecar will be deployed as a Kubernetes sidecar container. The Dapr sidecar will be responsible for publishing events, subscribing to events, and state management.
 
 ![Deployment architecture](./static-reources/service-arch.png)
 
@@ -37,14 +53,23 @@ We will be using *Python for Checkout* App and *Javascript for Order-Processor* 
 
 ### Container Registry for the Labs
 
-#### Authenticating to GHCR
+#### Authenticating with GHCR
 
-1. Create a [personal token (classic)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with the following scopes:
+- Create a [personal token (classic)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with the following scopes:
     - `read:packages`
     - `write:packages`
     - `delete:packages`
-2. Follow the steps in [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry) to authenticate to GHCR using the token you created in step 1.
-3. **Make sure** that any package that is published is marked as public so that it can later be read by the cluster without authentication.
+- Follow the steps in [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry) to authenticate to GHCR using the token you created in step 1.
+Run the following command to login to GHCR:
+```bash
+export CR_PAT=<your token>
+echo $CR_PAT | docker login ghcr.io -u <your username> --password-stdin
+```
+
+##### Make GHCR Packages public
+**Make sure** that any package that is published is marked as public so that it can later be read by the cluster without authentication.
+  - Go to `Package settings` in the package, and check the `Make this package public` checkbox at the end.
+![Package settings](./static-reources/package-settings.png)
 
 > Note: Make sure to log back into your **work docker logins** after you are done with the labs.
 
@@ -78,7 +103,7 @@ redis-replicas-2       1/1     Running   0               2d18h
 
 Now, you should be able to connect to your Redis instance with following commands:
 
-Start a redis-client pod:
+##### Start a redis-client pod
 
 ```bash
 kubectl run --namespace default redis-client --restart='Never'  --env REDIS_PASSWORD=  --image docker.io/bitnami/redis:7.0.4-debian-11-r11 --command -- sleep infinity
@@ -87,6 +112,7 @@ kubectl exec --tty -i redis-client \
    --namespace default -- bash
 ```
 
+##### Connect to the redis-client pod
 In the `exec` bash shell of the redis-client container, you should be able to connect to Redis with following command:
 
 ```bash
@@ -133,12 +159,24 @@ Now that both the dependencies are setup, we can move on to the Apps.
 
 ### Setup Apps without Dapr
 
-1. Git clone the [labs-201](https://github.com/dapr-learning/labs-201) codebase
-1. Once cloned, open it in vs-code using `code .`
-1. Observe the app.py once in the `checkout` folder, observe the definitions and usage of KafkaProducer from kafka-python library.
-    - It is a very small example and bare minimum to publish orderId to kafka, but very powerful to let us realize that our application is bound with kafka related code.
-1. In the `order-processor` folder, observe the definitions and usage of KafkaConsumer from kafka-python library.
-    - It is a very small example and bare minimum to consume orderId from kafka, but very powerful to let us realize that our application is bound with kafka related code.
+- Clone the repo [labs-201](https://github.com/dapr-learning/labs-201)
+With SSH:
+```bash
+git clone git@github.com:dapr-learning/labs-201.git
+```
+With HTTPS:
+```bash
+git clone https://github.com/dapr-learning/labs-201.git
+```
+With GitHub CLI:
+```bash
+gh repo clone dapr-learning/labs-201
+```
+- Once cloned, open it in vs-code using `code .`
+- Observe `app.py` in the `checkout` folder, observe the definitions and usage of KafkaProducer from kafka-python library.
+    - It is a small example to publish `orderId` to Kafka.
+- In the `order-processor` folder, open `app.js` and observe the definitions and usage of KafkaConsumer from kafka-python library.
+    - It is a small example to consume `orderId` from Kafka, and update the state store (Redis) with `orderId`.
 > Note both the above apps do not use Dapr
 
 
@@ -146,44 +184,50 @@ Now that both the dependencies are setup, we can move on to the Apps.
 
 > Note: Make sure you are logged into to your Container Registry through the docker command
 
-1. To build and push the `checkout` app, from a terminal in WSL2, run:
+- To build and push the `checkout` app, from a terminal in WSL2, run:
 ```bash
 # pwd should root folder of labs
 cd checkout
 docker build -t ghcr.io/<your-username>/checkout:latest .
 docker push ghcr.io/<your-username>/checkout:latest
 ```
-2. To build and push the `order-processor` app, from a terminal in WSL2, run:
+- To build and push the `order-processor` app, from a terminal in WSL2, run:
 ```bash
 # pwd should root folder of labs
 cd order-processor
 docker build -t ghcr.io/<your-username>/order-processor:latest .
 docker push ghcr.io/<your-username>/order-processor:latest
 ```
-3. In the deploy folder, you will find the `checkout-bare.yaml` and `order-processor-bare.yaml` files.
-4. Modify the lines in the yaml files to use the image that you just pushed to your container registry.
-    1. `image: ghcr.io/<your-username>/checkout:latest`
-    2. `image: ghcr.io/<your-username>/order-processor:latest`
-5. To deploy the apps, from a terminal in WSL2, run:
+- Make the above published images as `public` in your container registry. See [here](#make-ghcr-packages-public)
+- In the deploy folder, you will find the `checkout.yaml` and `order-processor.yaml` files.
+- Modify the lines in the yaml files to use the image that you just pushed to your container registry.
+  - `image: ghcr.io/<your-username>/checkout:latest`
+  - `image: ghcr.io/<your-username>/order-processor:latest`
+- To deploy the apps, from a terminal in WSL2, run:
 ```bash
-kubectl apply -f order-processor-bare.yaml
-kubectl apply -f checkout-bare.yaml
+kubectl apply -f order-processor.yaml
+kubectl apply -f checkout.yaml
 ```
-6. To check if the apps are running, run:
+- To check if the apps are running, run:
 ```bash
 kubectl get pods
 ```
-7. To view and follow the logs for the `checkout` app, run:
+- To view and follow the logs for the `checkout` app, run:
 ```bash
 kubectl logs -f checkout-<pod-id> python
 ```
-8. To view and follow the logs for the `order-processor` app, run:
+- To view and follow the logs for the `order-processor` app, run:
 ```bash
 kubectl logs -f order-processor-<pod-id> node
 ```
-9. Right now, we have just deployed apps without dapr. Use https://dapr.quip.com/q6QMADrOPQoM#temp:C:PZce3a8ed0c10724b64b21192967
-10. Once you have a terminal connected to Redis, check:
-    - Run `hgetall order-processor||orders` to see if the order is added to the state store
+- Right now, we have just deployed apps without dapr. Use steps defined [here](#connect-to-the-redis-client-pod) to connect to the redis server.
+- Once you have a terminal connected to Redis, check to see if the order is added to the state store
+```bash
+hgetall order-processor||orders
+```
+
+#### Cleanup
+<TBD>
 
 ### Setup Apps with Dapr
 
@@ -191,9 +235,13 @@ Now let's setup the same apps with Dapr.
 Assuming that you have already opened the labs-201 codebase in vs-code, let's move on to the next steps.
 
 First, we will Daprize *order-processor* App. We will do it in 3 parts:
-1. Part 1 - Daprize the App (Per app)
-2. Part 2- Adding K8s annotations for Dapr to work (Per app)
-3. Part 3 - Deploying the Apps and the required components
+- Part 1 - Daprize the App (Per app)
+- Part 2- Adding K8s annotations for Dapr to work (Per app)
+- Part 3 - Deploying the Apps and the required components
+
+Please follow the steps below to Daprize the App. If you want to skip the steps and see the final code, you can check the [completed-solution](./completed-solution/) for the completed code and deployment files.
+
+You will need to build the apps again for the Daprized version. You can see [here](#part-3---deploying-the-daprized-apps) for deploying the daprzied apps.
 
 #### Part 1 - Daprize the App (Order-processor)
 
@@ -242,7 +290,7 @@ const client = new DaprClient(DAPR_HOST, DAPR_PORT)
 #### Part 2 - Adding K8s annotations for Dapr to work (Order-processor)
 
 - Open the `deploy/order-processor.yaml` file
-- Add the following annotations to the `order-processor` deployment:
+- Add the following [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) to the `order-processor` deployment, in the metadata section of the deployment:
 ```yaml
     annotations:
       dapr.io/enabled: "true"
@@ -258,20 +306,20 @@ docker build -t ghcr.io/<your-username>/order-processor:latest .
 docker push ghcr.io/<your-username>/order-processor:latest
 ```
 
+
 #### Part 1 - Daprize the App (Checkout)
 - Open the `checkout/requirements.txt` file and remove the following dependencies:
-    - requests
     - kafka-python
 - Add the following dependency:
     - dapr
-- Open the `checkout/app.py` file and replace the **CODEBLOCK 1** with the following code:
+- Open the `checkout/app.py` file and replace **CODEBLOCK 1** with the following code:
 ```python
 import json
 import time
 from dapr.clients import DaprClient
 ```
 > We have replaced the kafka-python dependency with Dapr client
-- In the **CODEBLOCK 2** replace with the following code:
+- Replace **CODEBLOCK 2** with the following code:
 ```python
 class MessageProducer:
 
@@ -284,7 +332,7 @@ class MessageProducer:
         self.client.close()
 ```
 > We have changed the broker member variable to pubsub_name and removed the producer member variable and replaced it with a Dapr client
-- In the **CODEBLOCK 3** replace with the following code:
+- Replace **CODEBLOCK 3** with the following code:
 ```python
      def send_msg(self, msg):
         print(f"sending message... {msg}", flush=True)
@@ -299,10 +347,10 @@ class MessageProducer:
         except Exception as ex:
             return ex
 ```
-> Instead of self.producer.send, we are using the Dapr client to publish the event to the topic.
+> Instead of `self.producer.send()`, we are using the Dapr client to publish the event to the topic.
 
-> Note that we are using the rawPayload metadata to send the message as a string and to let Dapr know to not wrap the message in a CloudEvent envelope.
-- In the **CODEBLOCK 4** replace with the following code:
+> Note that we are using the `rawPayload` metadata to send the message as a string and to let Dapr know to not wrap the message in a CloudEvent envelope.
+- Replace **CODEBLOCK 4** with the following code:
 ```python
 pubsub_name = 'orderpubsub'
 topic = 'test-topic'
@@ -314,7 +362,7 @@ message_producer = MessageProducer(pubsub_name,topic)
 #### Part 2 - Adding K8s annotations for Dapr to work (Checkout)
 
 - Open the `deploy/checkout.yaml` file
-- Add the following annotations to the `checkout` deployment:
+- Add the following [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) to the `checkout` deployment, in the metadata section of the deployment:
 ```yaml
     annotations:
       dapr.io/enabled: "true"
@@ -350,7 +398,7 @@ docker push ghcr.io/<your-username>/checkout:latest
 > ```
 - Let's create the Dapr components in K8s needed for this lab:
 ```bash
-# pwd should root folder of labs
+# pwd should root folder of labs or the root of the completed-solution folder
 kubectl apply -f deploy/kafka-pubsub-dapr.yaml
 kubectl apply -f deploy/redis-state-dapr.yaml
 ```
@@ -383,6 +431,16 @@ kubectl logs -f checkout-<pod-id> python
 kubectl logs -f order-processor-<pod-id> node
 ```
 > Note: You can also view the daprd logs for the apps using the command `kubectl logs -f <pod-name> daprd`
-- Right now, we have just deployed apps without dapr. Use https://dapr.quip.com/q6QMADrOPQoM#temp:C:PZce3a8ed0c10724b64b21192967
-- Once you have a terminal connected to Redis, check:
-    - Run `hgetall order-processor||orders` to see if the order is added to the state store
+- Right now, we have just deployed apps without dapr. Use steps defined [here](#connect-to-the-redis-client-pod) to connect to the redis state store.
+- Once you have a terminal connected to Redis, check to see if the order is added to the state store
+```bash
+hgetall order-processor||orders
+```
+#### Cleanup
+<TBD>
+
+### Next Steps
+- Please do look at the other quickstarts available [here](https://github.com/dapr/quickstarts)
+- You can also look at the [Dapr docs](https://docs.dapr.io/) for more information on Dapr
+- You can also look at the [Dapr Python SDK docs](https://dapr.github.io/python-sdk/) for more information on the Python SDK
+- You can also look at the [Dapr JS SDK docs](https://dapr.github.io/js-sdk/) for more information on the JS SDK

@@ -20,4 +20,4 @@ spec:
     spec:
       containers:
       - name: python
-        image: ghcr.io/{YOUR_GITHUB_USERNAME}/checkout-dapr:latest
+        image: ghcr.io/{YOUR_GITHUB_USERNAME}/checkout:latest
