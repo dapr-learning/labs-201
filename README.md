@@ -28,6 +28,8 @@ This set of prerequisites is built with the assumption that participants are usi
     - Connect to AKS on WSL2 (Ideally, it is done in Step 1 itself, just confirmation by running few basic kubectl commands)
     - Install Dapr [Install the Dapr CLI | Dapr Docs](https://docs.dapr.io/getting-started/install-dapr-cli/)) and run `dapr init -k`
     - Setup a [virtual environment for Python](https://docs.python.org/3/tutorial/venv.html) (Atleast version 3.7)
+        1. Use `python3 -m venv .venv` to create a virtual environment (either `python3` or `python` should work)
+        1. Use `source .venv/bin/activate` to activate the virtual environment for Python
     - Install Docker:
         1. If using Docker Desktop: [Docker Desktop WSL 2 backend on Windows](https://docs.docker.com/desktop/windows/wsl/)
         1. If not using Docker Desktop: [Install Docker in WSL 2 without Docker Desktop](https://nickjanetakis.com/blog/install-docker-in-wsl-2-without-docker-desktop)
@@ -318,10 +320,16 @@ docker push ghcr.io/<your-username>/order-processor:latest
 
 
 #### Part 1 - Daprize the App (Checkout)
+- Please see the README file in the `checkout` folder for the instructions to setup the app in local environment.
 - Open the `checkout/requirements.txt` file and remove the following dependencies:
     - kafka-python
 - Add the following dependency:
     - dapr
+- Install the new dependencies:
+```bash
+    pip install -r checkout/requirements.txt
+```
+> Note: `pip` or `pip3` should work
 - Open the `checkout/app.py` file and replace **CODEBLOCK 1** with the following code:
 ```python
 import json
