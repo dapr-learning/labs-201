@@ -27,9 +27,12 @@ This set of prerequisites is built with the assumption that participants are usi
     - Install `kubectl` the [k8s CLI](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli#connect-to-the-cluster)
     - Connect to AKS on WSL2 (Ideally, it is done in Step 1 itself, just confirmation by running few basic kubectl commands)
     - Install Dapr [Install the Dapr CLI | Dapr Docs](https://docs.dapr.io/getting-started/install-dapr-cli/)) and run `dapr init -k`
+    - Install Pip for Python
+        1. Run `sudo apt install python3-pip` in WSL to install pip
     - Setup a [virtual environment for Python](https://docs.python.org/3/tutorial/venv.html) (Atleast version 3.7)
         1. Use `python3 -m venv .venv` to create a virtual environment (either `python3` or `python` should work)
         1. Use `source .venv/bin/activate` to activate the virtual environment for Python
+    - Setup [Node.js](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl)
     - Install Docker:
         1. If using Docker Desktop: [Docker Desktop WSL 2 backend on Windows](https://docs.docker.com/desktop/windows/wsl/)
         1. If not using Docker Desktop: [Install Docker in WSL 2 without Docker Desktop](https://nickjanetakis.com/blog/install-docker-in-wsl-2-without-docker-desktop)
