@@ -28,9 +28,9 @@ This set of prerequisites is built with the assumption that participants are usi
     - Connect to AKS on WSL2 (Ideally, it is done in Step 1 itself, just confirmation by running few basic kubectl commands)
     - Install Dapr [Install the Dapr CLI | Dapr Docs](https://docs.dapr.io/getting-started/install-dapr-cli/)) and run `dapr init -k`
     - Setup a [virtual environment for Python](https://docs.python.org/3/tutorial/venv.html) (Atleast version 3.7)
-3. [Docker Desktop](https://www.docker.com/products/docker-desktop/): Once you setup Docker Desktop on Windows, you should be able to use docker in WSL2 by enabling “Use the WSL 2 based Engine” in Settings → General.
-
-![Docker desktop settings](./static-reources/docker-desktop.png)
+    - Install Docker:
+        1. If using Docker Desktop: [Docker Desktop WSL 2 backend on Windows](https://docs.docker.com/desktop/windows/wsl/)
+        1. If not using Docker Desktop: [Install Docker in WSL 2 without Docker Desktop](https://nickjanetakis.com/blog/install-docker-in-wsl-2-without-docker-desktop)
 
 ## Welcome to Dapr 201
 
