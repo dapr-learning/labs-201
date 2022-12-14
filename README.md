@@ -75,7 +75,7 @@ echo $CR_PAT | docker login ghcr.io -u <your username> --password-stdin
   - Go to `Package settings` in the package, and check the `Make this package public` checkbox at the end.
 ![Package settings](./static-reources/package-settings.png)
 
-> Note: Make sure to log back into your **work docker logins** after you are done with the labs.
+> Note: Make sure to logout of the container registry after you are done with the labs. Command `docker logout ghcr.io`.
 
 ### Dependencies for the Apps
 
@@ -190,14 +190,14 @@ gh repo clone dapr-learning/labs-201
 
 - To build and push the `checkout` app, from a terminal in WSL2, run:
 ```bash
-# pwd should root folder of labs
+# pwd should be root folder of labs
 cd checkout
 docker build -t ghcr.io/<your-username>/checkout:latest .
 docker push ghcr.io/<your-username>/checkout:latest
 ```
 - To build and push the `order-processor` app, from a terminal in WSL2, run:
 ```bash
-# pwd should root folder of labs
+# pwd should be root folder of labs
 cd order-processor
 docker build -t ghcr.io/<your-username>/order-processor:latest .
 docker push ghcr.io/<your-username>/order-processor:latest
@@ -209,8 +209,9 @@ docker push ghcr.io/<your-username>/order-processor:latest
   - `image: ghcr.io/<your-username>/order-processor:latest`
 - To deploy the apps, from a terminal in WSL2, run:
 ```bash
-kubectl apply -f order-processor.yaml
-kubectl apply -f checkout.yaml
+# pwd should be root folder of labs
+kubectl apply -f deploy/order-processor.yaml
+kubectl apply -f deploy/checkout.yaml
 ```
 - To check if the apps are running, run:
 ```bash
@@ -240,8 +241,9 @@ hgetall order-processor||orders
 #### Cleanup
 We need to ensure that we have deleted deployments/services once we are done. For that, let's run following commands:
 ```bash
-kubectl delete -f order-processor.yaml
-kubectl delete -f checkout.yaml
+# pwd should be root folder of labs
+kubectl delete -f deploy/order-processor.yaml
+kubectl delete -f deploy/checkout.yaml
 ```
 
 ### Setup Apps with Dapr
@@ -315,7 +317,7 @@ const client = new DaprClient(DAPR_HOST, DAPR_PORT)
 ```
 - Let's build and push the containers:
 ```bash
-# pwd should root folder of labs
+# pwd should be root folder of labs
 cd order-processor
 docker build -t ghcr.io/<your-username>/order-processor:latest .
 docker push ghcr.io/<your-username>/order-processor:latest
@@ -392,7 +394,7 @@ message_producer = MessageProducer(pubsub_name,topic)
 ```
 - Let's build and push the containers:
 ```bash
-# pwd should root folder of labs
+# pwd should be root folder of labs
 cd checkout
 docker build -t ghcr.io/<your-username>/checkout:latest .
 docker push ghcr.io/<your-username>/checkout:latest
@@ -419,7 +421,7 @@ docker push ghcr.io/<your-username>/checkout:latest
 > ```
 - Let's create the Dapr components in K8s needed for this lab:
 ```bash
-# pwd should root folder of labs or the root of the completed-solution folder
+# pwd should be root folder of labs or the root of the completed-solution folder
 kubectl apply -f deploy/kafka-pubsub-dapr.yaml
 kubectl apply -f deploy/redis-state-dapr.yaml
 ```
@@ -456,7 +458,14 @@ kubectl logs -f order-processor-<pod-id> node
 - Once you have a terminal connected to Redis, follow these [steps](#How-to-verify-that-Apps-are-working-Fine) to verify everything is working as expected.
 
 #### Cleanup
-Follow same [cleanup steps](#Cleanup) as above.
+We need to ensure that we have deleted deployments/services once we are done. For that, let's run following commands:
+```bash
+# assume pwd is root folder of labs
+kubectl delete -f deploy/order-processor.yaml
+kubectl delete -f deploy/checkout.yaml
+```
+
+> Note: Make sure to logout of the container registry after you are done with the labs. Command `docker logout ghcr.io`.
 
 ### Next Steps
 - Please do look at the other quickstarts available [here](https://github.com/dapr/quickstarts)
