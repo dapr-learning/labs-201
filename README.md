@@ -1,7 +1,7 @@
 # Dapr 201 Labs
 
 ## Table of Contents
-- [Pre-requisites](#pre-requisites)
+- [Prerequisites](#prerequisites)
 - [Welcome to Dapr 201](#welcome-to-dapr-201)
   - [Deployment architecture](#deployment-architecture)
 - [Container registry for labs](#container-registry-for-the-labs)
@@ -15,20 +15,19 @@
 - [Setup apps with Dapr](#setup-apps-with-dapr)
 - [Next steps](#next-steps)
 
-## Pre-requisites
+## Prerequisites
 
-This set of pre-requisites is built with the assumption that participants are using Windows OS.
+This set of prerequisites is built with the assumption that participants are using WSL on Windows.
 
-1. AKS cluster setup (Quickstart: Deploy an AKS cluster by using the Azure portal - Azure Kubernetes Service | Microsoft Learn (https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-portal?tabs=azure-cli)): Create New Cluster (You can use either any MS subscription or even Private subscription)
-2. WSL2 (Install WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/install)). Setup following in WSL2:
-    - Terminal for WSL2 (Windows Terminal Customization for WSL2 - The Complete Guide (ceos3c.com) (https://www.ceos3c.com/wsl-2/windows-terminal-customization-wsl2/))
-    - VS Code: Should be able to open with code . . (Get started using VS Code with WSL | Microsoft Learn (https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode))
-    - Helm 3 (Helm | Installing Helm (https://helm.sh/docs/intro/install/))
+1. Create a new AKS cluster - [Quickstart: Deploy an AKS cluster by using the Azure portal - Azure Kubernetes Service | Microsoft Learn](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-portal?tabs=azure-cli)
+2. WSL2 - [Install WSL | Microsoft Learn](https://learn.microsoft.com/en-us/windows/wsl/install). Setup the following in WSL2:
+    - VS Code: Should be able to open with `code .` - [Get started using VS Code with WSL | Microsoft Learn](https://learn.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode)
+    - Helm 3 [Helm | Installing Helm](https://helm.sh/docs/intro/install/)
     - [Git](https://learn.microsoft.com/en-us/devops/develop/git/install-and-set-up-git)
-    - Install `kubectl` the [k8s CLI](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli#connect-to-the-cluster).
+    - Install `kubectl` the [k8s CLI](https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli#connect-to-the-cluster)
     - Connect to AKS on WSL2 (Ideally, it is done in Step 1 itself, just confirmation by running few basic kubectl commands)
-    - Install Dapr (Install the Dapr CLI | Dapr Docs (https://docs.dapr.io/getting-started/install-dapr-cli/)) and run dapr init -k
-    - Setup a virtual environment for Python (https://docs.python.org/3/tutorial/venv.html) (Atleast version 3.7)
+    - Install Dapr [Install the Dapr CLI | Dapr Docs](https://docs.dapr.io/getting-started/install-dapr-cli/)) and run `dapr init -k`
+    - Setup a [virtual environment for Python](https://docs.python.org/3/tutorial/venv.html) (Atleast version 3.7)
 3. [Docker Desktop](https://www.docker.com/products/docker-desktop/): Once you setup Docker Desktop on Windows, you should be able to use docker in WSL2 by enabling “Use the WSL 2 based Engine” in Settings → General.
 
 ![Docker desktop settings](./static-reources/docker-desktop.png)
